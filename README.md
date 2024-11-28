@@ -22,6 +22,7 @@
      - `GET /api/transactions?category=Groceries`
 
 5. **Filters and Pagination**
+
    - Endpoint: `GET /api/transactions/filter`
    - Description: Fetches transactions with optional filters and pagination.
    - Query Parameters:
@@ -34,3 +35,12 @@
      - `GET /api/transactions/filter?page=1&limit=5`
      - `GET /api/transactions/filter?type=income&category=Salary`
      - `GET /api/transactions/filter?minAmount=500&maxAmount=2000`
+
+6. **Export Data**
+   - Export transactions as CSV or PDF.
+   - Endpoints:
+     - `GET /api/transactions/export/csv?startDate=<date>&endDate=<date>`
+     - `GET /api/transactions/export/pdf?startDate=<date>&endDate=<date>`
+   - Query Parameters:
+     - `startDate`: Start of the date range (optional).
+     - `endDate`: End of the date range (optional).

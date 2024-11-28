@@ -1,4 +1,8 @@
 import Transaction from "../models/Transaction.js";
+import { createObjectCsvWriter } from "csv-writer";
+import fs from "fs";
+import path from "path";
+import PDFDocument from "pdfkit";
 
 export const addTransaction = async (req, res) => {
   try {
@@ -221,6 +225,108 @@ export const getFilteredTransactions = async (req, res) => {
         },
       },
     });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+export const exportTransactionsAsCSV = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    // Build query
+    const query = {};
+    if (startDate && endDate) {
+      query.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+
+    // Fetch transactions
+    const transactions = await Transaction.find(query);
+
+    if (!transactions || transactions.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No transactions found for the specified filter.",
+      });
+    }
+
+    // CSV data preparation
+    let csvData = "ID,Type,Amount (₹),Date,Category,Description\n";
+    transactions.forEach((transaction) => {
+      csvData += `${transaction._id},${transaction.type},₹${
+        transaction.amount
+      },${transaction.date.toISOString().split("T")[0]},${
+        transaction.category
+      },${transaction.description}\n`;
+    });
+
+    // Set headers for CSV download
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="transactions.csv"'
+    );
+
+    // Send CSV data
+    res.send(csvData);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+export const exportTransactionsAsPDF = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    // Build query
+    const query = {};
+    if (startDate && endDate) {
+      query.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+
+    // Fetch transactions
+    const transactions = await Transaction.find(query);
+
+    if (!transactions || transactions.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No transactions found for the specified filter.",
+      });
+    }
+
+    // Set headers for PDF download
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="transactions.pdf"'
+    );
+
+    // Create PDF document
+    const doc = new PDFDocument();
+    doc.pipe(res);
+
+    // Add content to PDF
+    doc.fontSize(20).text("Transaction Report", { align: "center" });
+    doc.moveDown();
+    transactions.forEach((transaction, index) => {
+      doc
+        .fontSize(12)
+        .text(
+          `${index + 1}. ID: ${transaction._id}, Type: ${
+            transaction.type
+          }, Amount: ₹${transaction.amount}, Date: ${
+            transaction.date.toISOString().split("T")[0]
+          }, Category: ${transaction.category}, Description: ${
+            transaction.description
+          }`
+        );
+    });
+
+    doc.end();
   } catch (error) {
     res
       .status(500)
