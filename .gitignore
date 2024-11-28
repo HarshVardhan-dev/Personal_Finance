@@ -17,3 +17,10 @@ logs/
 # Debugging Files
 *.swp
 *.swo
+
+
+# Ignore seedTransactions.js
+backend/seedTransactions.js
+
+# Ignore dummy_transactions.json
+backend/dummy_transactions.json

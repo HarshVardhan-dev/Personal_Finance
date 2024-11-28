@@ -5,6 +5,7 @@ import {
   deleteTransaction,
   getAllTransactions,
   getSummary,
+  getFilteredTransactions,
 } from "../controllers/transactionController.js";
 
 const router = express.Router();
@@ -14,5 +15,6 @@ router.post("/", addTransaction);
 router.put("/:id", editTransaction);
 router.delete("/:id", deleteTransaction);
 router.get("/summary", getSummary);
+router.get("/filter", getFilteredTransactions);
 
 export default router;

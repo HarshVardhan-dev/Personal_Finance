@@ -177,3 +177,53 @@ export const getSummary = async (req, res) => {
       .json({ success: false, message: "Server error", error: error.message });
   }
 };
+
+export const getFilteredTransactions = async (req, res) => {
+  try {
+    const {
+      type,
+      category,
+      minAmount,
+      maxAmount,
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    // Build the query object
+    const query = {};
+    if (type) query.type = type;
+    if (category) query.category = category;
+    if (minAmount && maxAmount) {
+      query.amount = { $gte: Number(minAmount), $lte: Number(maxAmount) };
+    }
+
+    // Pagination logic
+    const skip = (Number(page) - 1) * Number(limit);
+
+    // Fetch filtered transactions with pagination
+    const transactions = await Transaction.find(query)
+      .sort({ date: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    // Count total matching documents
+    const total = await Transaction.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      message: "Filtered transactions fetched successfully",
+      data: {
+        transactions,
+        pagination: {
+          total,
+          page: Number(page),
+          pages: Math.ceil(total / Number(limit)),
+        },
+      },
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};
