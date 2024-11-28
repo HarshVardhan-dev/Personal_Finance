@@ -125,3 +125,55 @@ export const getAllTransactions = async (req, res) => {
       .json({ success: false, message: "Server error", error: error.message });
   }
 };
+
+export const getSummary = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    // Validate input
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Start date and end date are required.",
+      });
+    }
+
+    const query = {
+      date: { $gte: new Date(startDate), $lte: new Date(endDate) },
+    };
+
+    const transactions = await Transaction.find(query);
+
+    // Calculate summary
+    const summary = transactions.reduce(
+      (acc, transaction) => {
+        if (transaction.type === "income") {
+          acc.totalIncome += transaction.amount;
+        } else if (transaction.type === "expense") {
+          acc.totalExpenses += transaction.amount;
+        }
+
+        // Calculate category-wise totals
+        if (!acc.categoryBreakdown[transaction.category]) {
+          acc.categoryBreakdown[transaction.category] = 0;
+        }
+        acc.categoryBreakdown[transaction.category] += transaction.amount;
+
+        return acc;
+      },
+      { totalIncome: 0, totalExpenses: 0, categoryBreakdown: {} }
+    );
+
+    summary.netBalance = summary.totalIncome - summary.totalExpenses;
+
+    res.status(200).json({
+      success: true,
+      message: "Summary fetched successfully",
+      summary,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};
