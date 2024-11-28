@@ -13,3 +13,9 @@
 3. **Delete Entry**
    - Endpoint: `DELETE /api/transactions/:id`
    - Description: Deletes an existing transaction from the database.
+4. **Get All Transactions**
+   - Endpoint: `GET /api/transactions`
+   - Description: Fetches all transactions, with optional filters for date range and category.
+   - Example Filters:
+     - `GET /api/transactions?startDate=2024-11-01&endDate=2024-11-30`
+     - `GET /api/transactions?category=Groceries`

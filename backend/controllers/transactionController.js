@@ -1,6 +1,5 @@
 import Transaction from "../models/Transaction.js";
 
-// Add a new transaction
 export const addTransaction = async (req, res) => {
   try {
     const { type, amount, date, category, description } = req.body;
@@ -91,6 +90,34 @@ export const deleteTransaction = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Transaction deleted successfully",
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+export const getAllTransactions = async (req, res) => {
+  try {
+    const { startDate, endDate, category } = req.query;
+
+    // Build query object based on filters
+    const query = {};
+    if (startDate && endDate) {
+      query.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+    if (category) {
+      query.category = category;
+    }
+
+    // Fetch transactions from the database
+    const transactions = await Transaction.find(query).sort({ date: -1 });
+
+    res.status(200).json({
+      success: true,
+      message: "Transactions fetched successfully",
+      transactions,
     });
   } catch (error) {
     res

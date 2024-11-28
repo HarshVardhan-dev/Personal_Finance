@@ -3,11 +3,12 @@ import {
   addTransaction,
   editTransaction,
   deleteTransaction,
+  getAllTransactions,
 } from "../controllers/transactionController.js";
 
 const router = express.Router();
 
-// POST: Add a new transaction
+router.get("/", getAllTransactions);
 router.post("/", addTransaction);
 router.put("/:id", editTransaction);
 router.delete("/:id", deleteTransaction);
