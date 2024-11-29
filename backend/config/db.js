@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import colors from "colors";
 
 const connectDB = async () => {
   try {
@@ -6,9 +7,13 @@ const connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(
+      colors.green.bold(
+        `✅ MongoDB Connected: ${conn.connection.host}:${conn.connection.port}`
+      )
+    );
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    console.error(colors.red.bold(`❌ Error: ${error.message}`));
     process.exit(1);
   }
 };

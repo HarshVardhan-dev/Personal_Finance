@@ -37,6 +37,7 @@
      - `GET /api/transactions/filter?minAmount=500&maxAmount=2000`
 
 6. **Export Data**
+
    - Export transactions as CSV or PDF.
    - Endpoints:
      - `GET /api/transactions/export/csv?startDate=<date>&endDate=<date>`
@@ -44,3 +45,45 @@
    - Query Parameters:
      - `startDate`: Start of the date range (optional).
      - `endDate`: End of the date range (optional).
+
+7. The `addRecurringTransaction` feature allows users to set up recurring transactions with the following details:
+
+- **Type**: Specifies if the transaction is an `income` or an `expense`.
+- **Amount**: The value of the transaction.
+- **Start Date**: The date from which the recurring transaction begins.
+- **End Date**: (Optional) The date on which the recurring transaction ends.
+- **Interval**: The frequency of recurrence, such as `daily`, `weekly`, or `monthly`.
+- **Category**: The category for the transaction (e.g., Rent, Utilities).
+- **Description**: Additional details about the transaction.
+
+### Pre-Creation of Transactions
+
+When a recurring transaction is added:
+
+1. **All transactions are pre-created in the database** for the specified duration (`startDate` to `endDate`).
+2. If `endDate` is not provided, transactions are pre-created for one year (configurable).
+3. Bulk insertion ensures performance and avoids runtime logic for recurring generation.
+
+### Benefits
+
+- Eliminates the need for runtime transaction generation.
+- Ensures transactions are always available for reporting or querying.
+- Simplifies recurring transaction logic.
+
+### How to Add Recurring Transactions
+
+Use the `/api/recurringTransactions` POST endpoint:
+
+#### Request Body
+
+```json
+{
+  "type": "expense",
+  "amount": 150,
+  "startDate": "2024-11-28",
+  "endDate": "2024-12-28",
+  "interval": "daily",
+  "category": "Utilities",
+  "description": "Daily electricity charges"
+}
+```
