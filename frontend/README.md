@@ -25,3 +25,34 @@
 - **Endpoint**: POST /api/auth/login
 - jsonCopy code{ "email": "user@example.com", "password": "securepassword"}
 - jsonCopy code{ "success": true, "token": ""}
+
+### **1\. Update README.md**
+
+Add the following content to README.md:
+
+### **Authentication**
+
+#### **Signup Page**
+
+- **Purpose**: Allow new users to register and create an account.
+- **File**: src/pages/Signup.js
+- **Description**:
+
+  - Users can sign up by providing their name, email, and password.
+  - On successful registration, the user is redirected to the login page.
+
+#### **Key Features**
+
+- Input validation for name, email, and password.
+- Displays error messages for invalid inputs or duplicate registration.
+- Secure API integration using Axios.
+
+#### **Route**
+
+- **URL**: /signup
+
+#### **API Integration**
+
+- **Endpoint**: POST /api/auth/signup
+- jsonCopy code{ "name": "John Doe", "email": "john.doe@example.com", "password": "securepassword"}
+- jsonCopy code{ "success": true, "message": "User registered successfully."}
