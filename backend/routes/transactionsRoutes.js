@@ -8,6 +8,7 @@ import {
   getFilteredTransactions,
   exportTransactionsAsCSV,
   exportTransactionsAsPDF,
+  searchTransactions,
 } from "../controllers/transactionController.js";
 
 const router = express.Router();
@@ -20,5 +21,6 @@ router.get("/summary", getSummary);
 router.get("/filter", getFilteredTransactions);
 router.get("/export/csv", exportTransactionsAsCSV);
 router.get("/export/pdf", exportTransactionsAsPDF);
+router.get("/search", searchTransactions);
 
 export default router;

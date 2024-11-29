@@ -9,6 +9,8 @@ import colors from "colors";
 import transactionRoutes from "./routes/transactionsRoutes.js";
 import recurringTransactionRoutes from "./routes/recurringTransactionsRoutes.js";
 import budgetRoutes from "./routes/budgetRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 dotenv.config();
 const app = express();
 
@@ -21,6 +23,8 @@ app.use(express.json());
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/recurringTransactions", recurringTransactionRoutes);
 app.use("/api/budgets", budgetRoutes);
+app.use("/api/reports", reportRoutes);
+app.use("/api/auth", authRoutes);
 
 // MongoDB Connection
 connectDB();

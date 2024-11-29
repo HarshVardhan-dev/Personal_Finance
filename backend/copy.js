@@ -1,75 +1,61 @@
-import RecurringTransaction from "../models/RecurringTransaction.js";
 import Transaction from "../models/Transaction.js";
 
-export const generateRecurringTransactions = async () => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Ensure time is reset for date comparison
-
+export const searchTransactions = async (req, res) => {
   try {
-    // Fetch recurring transactions that are active today
-    const recurringTransactions = await RecurringTransaction.find({
-      startDate: { $lte: today },
-      $or: [{ endDate: null }, { endDate: { $gte: today } }],
-    });
+    const {
+      type,
+      category,
+      minAmount,
+      maxAmount,
+      startDate,
+      endDate,
+      page = 1,
+      limit = 10,
+    } = req.query;
 
-    console.log("Fetched Recurring Transactions:", recurringTransactions);
+    const filter = {};
 
-    for (const recurring of recurringTransactions) {
-      const { type, amount, interval, category, description, startDate } =
-        recurring;
-
-      // Fetch the last transaction for this recurring entry
-      const lastTransaction = await Transaction.findOne({
-        type,
-        category,
-        description,
-      }).sort({ date: -1 });
-
-      console.log("Last Transaction:", lastTransaction);
-
-      // Determine the date to start generating transactions
-      let nextTransactionDate = lastTransaction
-        ? new Date(lastTransaction.date)
-        : new Date(startDate);
-
-      console.log("Initial Next Transaction Date:", nextTransactionDate);
-
-      // Generate transactions until today
-      while (nextTransactionDate < today) {
-        // Increment the date based on the interval
-        if (interval === "daily")
-          nextTransactionDate.setDate(nextTransactionDate.getDate() + 1);
-        else if (interval === "weekly")
-          nextTransactionDate.setDate(nextTransactionDate.getDate() + 7);
-        else if (interval === "monthly")
-          nextTransactionDate.setMonth(nextTransactionDate.getMonth() + 1);
-
-        console.log("Next Transaction Date:", nextTransactionDate);
-
-        // Skip if the next transaction date exceeds today
-        if (nextTransactionDate > today) break;
-
-        // Create the transaction in the database
-        await Transaction.create({
-          type,
-          amount,
-          date: nextTransactionDate,
-          category,
-          description,
-        });
-
-        console.log("Transaction Created:", {
-          type,
-          amount,
-          date: nextTransactionDate,
-          category,
-          description,
-        });
-      }
+    // Add filters based on query parameters
+    if (type) filter.type = type;
+    if (category) filter.category = category;
+    if (minAmount || maxAmount) {
+      filter.amount = {};
+      if (minAmount) filter.amount.$gte = parseFloat(minAmount);
+      if (maxAmount) filter.amount.$lte = parseFloat(maxAmount);
+    }
+    if (startDate || endDate) {
+      filter.date = {};
+      if (startDate) filter.date.$gte = new Date(startDate);
+      if (endDate) filter.date.$lte = new Date(endDate);
     }
 
-    console.log("Recurring transactions generated successfully");
+    // Pagination
+    const skip = (page - 1) * limit;
+
+    // Fetch filtered transactions with pagination
+    const transactions = await Transaction.find(filter)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .sort({ date: -1 }); // Sort by most recent
+
+    // Count total results for pagination
+    const totalResults = await Transaction.countDocuments(filter);
+
+    res.status(200).json({
+      success: true,
+      data: transactions,
+      pagination: {
+        totalResults,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(totalResults / limit),
+      },
+    });
   } catch (error) {
-    console.error("Error generating recurring transactions:", error.message);
+    console.error("Error Searching Transactions:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Error searching transactions.",
+      error: error.message,
+    });
   }
 };
