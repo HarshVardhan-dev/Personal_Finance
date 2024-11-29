@@ -6,9 +6,9 @@ import bodyParser from "body-parser";
 import colors from "colors";
 
 // Routes Imported
-import transactionRoutes from "./routes/transactions.js";
-import recurringTransactionRoutes from "./routes/recurringTransactions.js";
-
+import transactionRoutes from "./routes/transactionsRoutes.js";
+import recurringTransactionRoutes from "./routes/recurringTransactionsRoutes.js";
+import budgetRoutes from "./routes/budgetRoutes.js";
 dotenv.config();
 const app = express();
 
@@ -20,6 +20,7 @@ app.use(express.json());
 // Routes
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/recurringTransactions", recurringTransactionRoutes);
+app.use("/api/budgets", budgetRoutes);
 
 // MongoDB Connection
 connectDB();

@@ -87,3 +87,41 @@ Use the `/api/recurringTransactions` POST endpoint:
   "description": "Daily electricity charges"
 }
 ```
+
+## **Features Implemented**
+
+### **1\. Add a Budget**
+
+- **Endpoint**: POST /api/budgets
+- **Description**: Adds a budget for a specific category and time period.
+- **Request Payload**:
+
+  - category: The category for the budget (e.g., "Groceries").
+  - amount: The budgeted amount.
+  - timePeriod: The time period for the budget (monthly or yearly).
+  - startDate: The start date for the budget.
+  - endDate: The end date for the budget.
+
+- **Response**:
+
+  - **201**: Budget added successfully.
+  - **400**: Overlapping budget exists.
+
+### **2\. Compare Actual vs Budgeted**
+
+- **Endpoint**: GET /api/budgets/comparison
+- **Description**: Compares actual spending or income with budgeted amounts for categories within a specified time period.
+- **Query Parameters**:
+
+  - category (optional): Filter by category.
+  - timePeriod (required): The budget's time period (monthly or yearly).
+  - startDate: The start date of the range (required).
+  - endDate: The end date of the range (required).
+
+- jsonCopy code{ "success": true, "data": \[ { "category": "Groceries", "budgetedAmount": 5000, "actualAmount": 4500, "difference": 500 }, { "category": "Utilities", "budgetedAmount": 2000, "actualAmount": 2500, "difference": -500 } \]}
+
+### **3\. Overspending Alerts**
+
+- **Endpoint**: GET /api/budgets/alerts
+- **Description**: Fetches categories where actual spending exceeds the budgeted amount.
+- jsonCopy code{ "success": true, "data": \[ { "category": "Utilities", "budgetedAmount": 2000, "actualAmount": 2500, "difference": -500 }, { "category": "Entertainment", "budgetedAmount": 1000, "actualAmount": 1200, "difference": -200 } \]}

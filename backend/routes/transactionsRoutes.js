@@ -10,7 +10,6 @@ import {
   exportTransactionsAsPDF,
 } from "../controllers/transactionController.js";
 
-import Transaction from "../models/Transaction.js";
 const router = express.Router();
 
 router.get("/", getAllTransactions);
