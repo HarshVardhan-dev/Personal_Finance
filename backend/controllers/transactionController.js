@@ -142,11 +142,39 @@ export const getSummary = async (req, res) => {
       });
     }
 
-    const query = {
-      date: { $gte: new Date(startDate), $lte: new Date(endDate) },
+    // Validate date format
+    if (isNaN(new Date(startDate)) || isNaN(new Date(endDate))) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid date format. Please provide valid ISO date strings.",
+      });
+    }
+
+    const parsedStartDate = new Date(startDate);
+    const parsedEndDate = new Date(endDate);
+
+    const filter = {
+      date: {
+        $gte: parsedStartDate,
+        $lte: parsedEndDate,
+      },
     };
 
-    const transactions = await Transaction.find(query);
+    const transactions = await Transaction.find(filter);
+
+    // Handle empty transactions
+    if (!transactions.length) {
+      return res.status(200).json({
+        success: true,
+        message: "No transactions found for the given period.",
+        summary: {
+          totalIncome: 0,
+          totalExpenses: 0,
+          netBalance: 0,
+          categoryBreakdown: {},
+        },
+      });
+    }
 
     // Calculate summary
     const summary = transactions.reduce(
@@ -176,6 +204,7 @@ export const getSummary = async (req, res) => {
       summary,
     });
   } catch (error) {
+    console.error("Error in getSummary:", error.message);
     res
       .status(500)
       .json({ success: false, message: "Server error", error: error.message });

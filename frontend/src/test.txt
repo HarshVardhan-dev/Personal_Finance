@@ -1,3 +1,0 @@
-How to test the login API?
-
-Explain how to handle authentication errors
