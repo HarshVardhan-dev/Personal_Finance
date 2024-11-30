@@ -4,14 +4,13 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./Components/PrivateRoute";
+import TransactionsPage from "./Components/TransactionsPage";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+        {/* Main Dashboard */}
         <Route
           path="/dashboard"
           element={
@@ -20,6 +19,20 @@ function App() {
             </PrivateRoute>
           }
         />
+
+        {/* Standalone Transactions Page */}
+        <Route
+          path="/transactions"
+          element={
+            <PrivateRoute>
+              <TransactionsPage />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Authentication Routes */}
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
   );
